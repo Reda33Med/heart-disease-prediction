@@ -21,6 +21,34 @@ if model_name == "svm":
     print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
     apply_pca = input().lower() == "yes"
 
+if model_name == "random_forest":
+
+    apply_pca = False  # PCA is not applied for Random Forest
+
+    n_estimators_input = input("Enter the number of estimators for Random Forest (default is 100): ")
+
+    if n_estimators_input:
+        try:
+            n_estimators = int(n_estimators_input)
+        except ValueError:
+            raise ValueError("Number of estimators must be an integer.")
+
+    max_depth_input = input("Enter the maximum depth for Random Forest (default is None): ")
+
+    if max_depth_input:
+        try:
+            max_depth = int(max_depth_input)
+        except ValueError:
+            raise ValueError("Maximum depth must be an integer.")
+
+    min_samples_split_input = input("Enter the minimum samples split for Random Forest (default is 2): ")
+
+    if min_samples_split_input:
+        try:
+            min_samples_split = int(min_samples_split_input)
+        except ValueError:
+            raise ValueError("Minimum samples split must be an integer.")
+
 # 1. Define file paths
 DATA_PATH = Path("data") / "Heart_Disease_Cleveland.csv"
 
