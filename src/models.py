@@ -18,12 +18,13 @@ def choose_model(model_name: str,
     if model_name == "svm":
 
         classifier = SVC(probability=True, random_state=42)
-        
+
     elif model_name == "random_forest":
 
         classifier = RandomForestClassifier(n_estimators=n_estimators_input,
                                             max_depth=max_depth_input,
-                                            min_samples_split=min_samples_split_input)
+                                            min_samples_split=min_samples_split_input,
+                                            random_state=42)
     else:
         raise ValueError(
             "Invalid model name. Choose 'svm' or 'random_forest'."
