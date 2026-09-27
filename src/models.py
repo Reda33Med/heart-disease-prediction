@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from src.preprocessing import build_preprocessor
 
 
-def choose_model(model_name: str) -> Pipeline:
+def choose_model(model_name: str , apply_pca: bool) -> Pipeline:
     """Choose and return a machine learning pipeline based on the provided model name."""
 
     # 1. Select the classifier object based on model_name
@@ -22,7 +22,7 @@ def choose_model(model_name: str) -> Pipeline:
     return Pipeline(
         [
             ("preprocessor", build_preprocessor()),
-            ("pca", PCA(n_components=5)),
+            ("pca", PCA(n_components=5) if apply_pca else None),
             ("classifier", classifier),
         ]
     )
