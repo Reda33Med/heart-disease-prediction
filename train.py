@@ -26,9 +26,9 @@ if model_name == "svm":
 elif model_name == "random_forest":
     print("You have chosen Random Forest model.")
 
-n_estimators_input = 100  # Default value
-max_depth_input = None  # Default value
-min_samples_split_input = 2  # Default value
+n_estimators = 100  # Default value
+max_depth = None  # Default value
+min_samples_split = 2  # Default value
 
 if model_name == "svm":
     print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
@@ -42,23 +42,23 @@ if model_name == "random_forest":
 
     if n_estimators_input:
         try:
-            n_estimators_input = int(n_estimators_input)
+            n_estimators = int(n_estimators_input)
         except ValueError:
             raise ValueError("Number of estimators must be an integer.")
 
-    max_depth_input = input("Enter the maximum depth for Random Forest (default is None), and the range is [1, inf): ")
+    max_depth_input = input("Enter the maximum depth for Random Forest (default is None), and the range is [0, inf): ")
 
-    if max_depth_input:
+    if max_depth_input and int(max_depth_input) >= 0:
         try:
-            max_depth_input = int(max_depth_input)
+            max_depth = int(max_depth_input)
         except ValueError:
-            raise ValueError("Maximum depth must be an integer.")
+            raise ValueError("Maximum depth must be a positive integer.")
 
     min_samples_split_input = input("Enter the minimum samples split for Random Forest (default is 2): ")
 
     if min_samples_split_input:
         try:
-            min_samples_split_input = int(min_samples_split_input)
+            min_samples_split = int(min_samples_split_input)
         except ValueError:
             raise ValueError("Minimum samples split must be an integer.")
 
@@ -74,9 +74,9 @@ print("Training model pipeline...")
 
 pipeline = choose_model(model_name ,
                         apply_pca if model_name == "svm" else False,
-                        n_estimators_input,
-                        max_depth_input,
-                        min_samples_split_input)
+                        n_estimators,
+                        max_depth,
+                        min_samples_split)
 
 pipeline.fit(X_train, y_train)
 

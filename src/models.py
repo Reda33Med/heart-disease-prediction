@@ -7,9 +7,9 @@ from src.preprocessing import build_preprocessor
 
 def choose_model(model_name: str,
                  apply_pca: bool,
-                 n_estimators_input: int = 100,
-                 max_depth_input: int = 0,
-                 min_samples_split_input: int = 2) -> Pipeline:
+                 n_estimators: int = 100,
+                 max_depth: int | None = 0,
+                 min_samples_split: int = 2) -> Pipeline:
 
     
     """Choose and return a machine learning pipeline based on the provided model name."""
@@ -21,9 +21,9 @@ def choose_model(model_name: str,
 
     elif model_name == "random_forest":
 
-        classifier = RandomForestClassifier(n_estimators=n_estimators_input,
-                                            max_depth=max_depth_input,
-                                            min_samples_split=min_samples_split_input,
+        classifier = RandomForestClassifier(n_estimators=n_estimators,
+                                            max_depth=max_depth,
+                                            min_samples_split=min_samples_split,
                                             random_state=42)
     else:
         raise ValueError(
