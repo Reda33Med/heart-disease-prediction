@@ -1,5 +1,15 @@
+#getting the path of the current file
 from pathlib import Path
+
+# scores
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+
+#sourcing the functions from the src folder
 from src.data_loader import load_data, split_data
 from src.models import choose_model
 
@@ -64,6 +74,12 @@ pipeline.fit(X_train, y_train)
 # 4. Predict probabilities and score
 print("Predicting probabilities...")
 y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
-score = roc_auc_score(y_test, y_pred_proba)
 
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {score:.4f}")
+roc_auc_score = roc_auc_score(y_test, y_pred_proba)
+
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score:.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, pipeline.predict(X_test)):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, pipeline.predict(X_test)):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, pipeline.predict(X_test)):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, pipeline.predict(X_test)):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, pipeline.predict(X_test))}")
