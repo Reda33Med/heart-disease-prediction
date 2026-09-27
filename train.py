@@ -26,6 +26,9 @@ if model_name == "svm":
 elif model_name == "random_forest":
     print("You have chosen Random Forest model.")
 
+n_estimators_input = 100  # Default value
+max_depth_input = None  # Default value
+min_samples_split_input = 2  # Default value
 
 if model_name == "svm":
     print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
@@ -34,20 +37,20 @@ if model_name == "svm":
 if model_name == "random_forest":
 
     apply_pca = False  # PCA is not applied for Random Forest
-
+    
     n_estimators_input = input("Enter the number of estimators for Random Forest (default is 100): ")
 
     if n_estimators_input:
         try:
-            n_estimators = int(n_estimators_input)
+            n_estimators_input = int(n_estimators_input)
         except ValueError:
             raise ValueError("Number of estimators must be an integer.")
 
-    max_depth_input = input("Enter the maximum depth for Random Forest (default is None): ")
+    max_depth_input = input("Enter the maximum depth for Random Forest (default is None), and the range is [1, inf): ")
 
     if max_depth_input:
         try:
-            max_depth = int(max_depth_input)
+            max_depth_input = int(max_depth_input)
         except ValueError:
             raise ValueError("Maximum depth must be an integer.")
 
@@ -55,7 +58,7 @@ if model_name == "random_forest":
 
     if min_samples_split_input:
         try:
-            min_samples_split = int(min_samples_split_input)
+            min_samples_split_input = int(min_samples_split_input)
         except ValueError:
             raise ValueError("Minimum samples split must be an integer.")
 
@@ -68,7 +71,13 @@ X_train, X_test, y_train, y_test = split_data(X, y)
 
 # 3. Instantiate and fit model pipeline
 print("Training model pipeline...")
-pipeline = choose_model(model_name , apply_pca if model_name == "svm" else False)
+
+pipeline = choose_model(model_name ,
+                        apply_pca if model_name == "svm" else False,
+                        n_estimators_input,
+                        max_depth_input,
+                        min_samples_split_input)
+
 pipeline.fit(X_train, y_train)
 
 # 4. Predict probabilities and score
