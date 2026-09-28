@@ -8,6 +8,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
+from sklearn.model_selection import StratifiedKFold, cross_validate
 
 #sourcing the functions from the src folder
 from src.data_loader import load_data, split_data
@@ -78,9 +79,28 @@ pipeline = choose_model(model_name ,
                         max_depth,
                         min_samples_split)
 
+# 4. Evaluate with stratified cross-validation on the training set
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+cv_scores = cross_validate(
+    pipeline,
+    X_train,
+    y_train,
+    cv=cv,
+    scoring=("roc_auc", "f1", "precision", "recall", "accuracy"),
+)
+
+print("5-fold cross-validation scores (mean +/- standard deviation):")
+
+for metric in ("roc_auc", "f1", "precision", "recall", "accuracy"):
+    scores = cv_scores[f"test_{metric}"]
+    print(f"{metric}: {scores.mean():.4f} +/- {scores.std():.4f}")
+
+# 5. Fit the final pipeline on all training data
 pipeline.fit(X_train, y_train)
 
-# 4. Predict probabilities and score
+# 6. Predict probabilities and score on the held-out test set
 print("Predicting probabilities...")
 y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
