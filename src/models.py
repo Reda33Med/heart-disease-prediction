@@ -1,4 +1,5 @@
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
@@ -17,7 +18,10 @@ def choose_model(model_name: str,
     # 1. Select the classifier object based on model_name
     if model_name == "svm":
 
-        classifier = SVC(probability=True, random_state=42)
+        classifier = CalibratedClassifierCV(
+            estimator=SVC(random_state=42),
+            ensemble=False,
+        )
 
     elif model_name == "random_forest":
 
