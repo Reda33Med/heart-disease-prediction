@@ -102,13 +102,14 @@ pipeline.fit(X_train, y_train)
 
 # 6. Predict probabilities and score on the held-out test set
 print("Predicting probabilities...")
+
+y_pred = pipeline.predict(X_test)
 y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
-roc_auc_score = roc_auc_score(y_test, y_pred_proba)
 
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score:.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, pipeline.predict(X_test)):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, pipeline.predict(X_test)):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, pipeline.predict(X_test)):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, pipeline.predict(X_test)):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, pipeline.predict(X_test))}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred)}")
