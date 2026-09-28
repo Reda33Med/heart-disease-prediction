@@ -8,7 +8,7 @@ from src.preprocessing import build_preprocessor
 def choose_model(model_name: str,
                  apply_pca: bool,
                  n_estimators: int = 100,
-                 max_depth: int | None = 0,
+                 max_depth: int | None = None,
                  min_samples_split: int = 2) -> Pipeline:
 
     
