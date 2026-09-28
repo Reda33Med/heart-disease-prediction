@@ -47,8 +47,9 @@ heart-disease-prediction/
 
 ## 📊 Results
 
-The model pipeline is evaluated on the held-out test set using the **ROC-AUC score**:
+```text
 
-| Model | Evaluation Metric | Score |
-| :--- | :--- | :--- |
-| Random Forest Classifier | ROC-AUC | ~0.85+ |
+Results will be added after completing model
+comparison and final evaluation.
+
+```

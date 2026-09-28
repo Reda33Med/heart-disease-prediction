@@ -56,7 +56,7 @@ if model_name == "random_forest":
 
     min_samples_split_input = input("Enter the minimum samples split for Random Forest (default is 2): ")
 
-    if min_samples_split_input:
+    if min_samples_split_input and int(min_samples_split_input) >= 2:
         try:
             min_samples_split = int(min_samples_split_input)
         except ValueError:
