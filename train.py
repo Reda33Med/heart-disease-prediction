@@ -49,25 +49,37 @@ if model_name == "random_forest":
 
     max_depth_input = input("Enter the maximum depth for Random Forest (default is None), and the range is [0, inf): ")
 
-    if max_depth_input and int(max_depth_input) >= 0:
+    if max_depth_input :
         try:
             max_depth = int(max_depth_input)
         except ValueError:
             raise ValueError("Maximum depth must be a positive integer.")
+        else:
+            if max_depth <= 0:
+                raise ValueError("Maximum depth must be a positive integer.")
 
     min_samples_split_input = input("Enter the minimum samples split for Random Forest (default is 2): ")
 
-    if min_samples_split_input and int(min_samples_split_input) >= 2:
+    if min_samples_split_input:
         try:
             min_samples_split = int(min_samples_split_input)
         except ValueError:
             raise ValueError("Minimum samples split must be an integer.")
+        else:
+            if min_samples_split < 2:
+                raise ValueError("Minimum samples split must be at least 2.")
 
 # 1. Define file paths
 DATA_PATH = Path("data") / "Heart_Disease_Cleveland.csv"
 
+# asking for the categorical columns from the user
+categorical_columns_input = input("Enter the categorical columns separated by commas (or leave blank if none): ")
+categorical_columns = [col.strip() for col in categorical_columns_input.split(",") if col.strip()] if categorical_columns_input else None
+
+print(f"The Categorical columns you have chosen are: {categorical_columns}")
+
 # 2. Load and split dataset
-X, y = load_data(DATA_PATH)
+X, y = load_data(DATA_PATH, categorical_columns=categorical_columns)
 X_train, X_test, y_train, y_test = split_data(X, y)
 
 # 3. Instantiate and fit model pipeline
