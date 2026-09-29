@@ -16,20 +16,16 @@ from sklearn.model_selection import StratifiedKFold, cross_validate
 from src.data_loader import load_data, split_data
 from src.models import choose_model
 
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--threshold', type=float, default=0.3, help='Threshold for classification (default: 0.3)')
-parser.add_argument('--model_name', type=str , default='svm', help='Picking a model (default : svm)')
+parser.add_argument('--model_name', type=str, default='svm', help='Picking a model (default: svm)')
+parser.add_argument('--data_path', type=Path, default=Path('data/Heart_Disease_Cleveland.csv'), help='Path to dataset (default: data/Heart_Disease_Cleveland.csv)')
 
 args = parser.parse_args()
 
 # 0.picking the model to train
 print("Starting training script...")
-#print("Choose model: 'svm' or 'random_forest'")
-#model_name = input("Enter model name: ")
-
-
 
 if args.model_name not in ["svm", "random_forest"]:
     raise ValueError("Invalid model name. Choose 'svm' or 'random_forest'.")
@@ -129,7 +125,6 @@ print("Predicting probabilities...")
 
 y_pred_proba = pipeline.predict_proba(X_test)[:,1]
 y_pred_threshold = (y_pred_proba >= args.threshold).astype(int)
-
 
 print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
 print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred_threshold):.4f}")
