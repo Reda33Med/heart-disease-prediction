@@ -1,3 +1,5 @@
+import argparse
+
 #getting the path of the current file
 from pathlib import Path
 
@@ -14,28 +16,38 @@ from sklearn.model_selection import StratifiedKFold, cross_validate
 from src.data_loader import load_data, split_data
 from src.models import choose_model
 
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--threshold', type=float, default=0.3, help='Threshold for classification (default: 0.3)')
+parser.add_argument('--model_name', type=str , default='svm', help='Picking a model (default : svm)')
+
+args = parser.parse_args()
+
 # 0.picking the model to train
 print("Starting training script...")
-print("Choose model: 'svm' or 'random_forest'")
-model_name = input("Enter model name: ")
+#print("Choose model: 'svm' or 'random_forest'")
+#model_name = input("Enter model name: ")
 
-if model_name not in ["svm", "random_forest"]:
+
+
+if args.model_name not in ["svm", "random_forest"]:
     raise ValueError("Invalid model name. Choose 'svm' or 'random_forest'.")
 
-if model_name == "svm":
+if args.model_name == "svm":
     print("You have chosen SVM model.")
-elif model_name == "random_forest":
+elif args.model_name == "random_forest":
     print("You have chosen Random Forest model.")
 
 n_estimators = 100  # Default value
 max_depth = None  # Default value
 min_samples_split = 2  # Default value
 
-if model_name == "svm":
+if args.model_name == "svm":
     print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
     apply_pca = input().lower() == "yes"
 
-if model_name == "random_forest":
+if args.model_name == "random_forest":
 
     apply_pca = False  # PCA is not applied for Random Forest
     
@@ -85,8 +97,8 @@ X_train, X_test, y_train, y_test = split_data(X, y)
 # 3. Instantiate and fit model pipeline
 print("Training model pipeline...")
 
-pipeline = choose_model(model_name ,
-                        apply_pca if model_name == "svm" else False,
+pipeline = choose_model(args.model_name ,
+                        apply_pca if args.model_name == "svm" else False,
                         n_estimators,
                         max_depth,
                         min_samples_split)
@@ -115,13 +127,13 @@ pipeline.fit(X_train, y_train)
 # 6. Predict probabilities and score on the held-out test set
 print("Predicting probabilities...")
 
-y_pred = pipeline.predict(X_test)
-y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
+y_pred_proba = pipeline.predict_proba(X_test)[:,1]
+y_pred_threshold = (y_pred_proba >= args.threshold).astype(int)
 
 
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred)}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred_threshold)}")
