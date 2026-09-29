@@ -28,7 +28,7 @@ def build_preprocessor() -> ColumnTransformer:
             (
                 "numerical",
                 numerical_pipeline,
-                make_column_selector(dtype_include="number"),
+                make_column_selector(dtype_include= "number"),
             ),
             (
                 "categorical",
