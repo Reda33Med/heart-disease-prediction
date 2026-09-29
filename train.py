@@ -16,69 +16,53 @@ from sklearn.model_selection import StratifiedKFold, cross_validate
 from src.data_loader import load_data, split_data
 from src.models import choose_model
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description= "Train a machine learning model for heart disease prediction.")
 
+# parsing the command line arguments
 parser.add_argument('--threshold', type=float, default=0.3, help='Threshold for classification (default: 0.3)')
 parser.add_argument('--model_name', type=str, default='svm', help='Picking a model (default: svm)')
-parser.add_argument('--data_path', type=Path, default=Path('data/Heart_Disease_Cleveland.csv'), help='Path to dataset (default: data/Heart_Disease_Cleveland.csv)')
+parser.add_argument('--data_path', type=str, default='data/Heart_Disease_Cleveland.csv', help='Path to dataset (default: data/Heart_Disease_Cleveland.csv)')
+# Additional parameters for Random Forest Classifier
+parser.add_argument('--rfc_n_estimators', type=int, default=100, help='The number of estimators for the model random forest classifier (default: 100)')
+parser.add_argument('--rfc_max_depth', type=int, default=None, help='The Maximum depth for the model random forest classifier, range is (0, +inf) (default: None)')
+parser.add_argument('--rfc_min_samples_split', type=int, default=2, help='The Minimum samples split for Random Forest classifier (default is 2)')
+
 
 args = parser.parse_args()
+
+# Extracting the command line arguments into variables
+model_name = args.model_name
+DATA_PATH = Path(args.data_path)
+pred_threshold = args.threshold
+n_estimators = args.rfc_n_estimators
+max_depth = args.rfc_max_depth
+min_samples_split = args.rfc_min_samples_split
 
 # 0.picking the model to train
 print("Starting training script...")
 
-if args.model_name not in ["svm", "random_forest"]:
+if model_name not in ["svm", "random_forest"]:
     raise ValueError("Invalid model name. Choose 'svm' or 'random_forest'.")
 
-if args.model_name == "svm":
+if model_name == "svm":
     print("You have chosen SVM model.")
-elif args.model_name == "random_forest":
+elif model_name == "random_forest":
     print("You have chosen Random Forest model.")
 
-n_estimators = 100  # Default value
-max_depth = None  # Default value
-min_samples_split = 2  # Default value
-
-if args.model_name == "svm":
+if model_name == "svm":
     print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
     apply_pca = input().lower() == "yes"
 
-if args.model_name == "random_forest":
+if model_name == "random_forest":
 
     apply_pca = False  # PCA is not applied for Random Forest
-    
-    n_estimators_input = input("Enter the number of estimators for Random Forest (default is 100): ")
 
-    if n_estimators_input:
-        try:
-            n_estimators = int(n_estimators_input)
-        except ValueError:
-            raise ValueError("Number of estimators must be an integer.")
+    if max_depth is not None and max_depth <= 0:
+        raise ValueError("Maximum depth must be a strictly positive integer.")
 
-    max_depth_input = input("Enter the maximum depth for Random Forest (default is None), and the range is [0, inf): ")
+    if min_samples_split < 2:
+        raise ValueError("Minimum samples split must be greater than or equal to 2.")
 
-    if max_depth_input :
-        try:
-            max_depth = int(max_depth_input)
-        except ValueError:
-            raise ValueError("Maximum depth must be a positive integer.")
-        else:
-            if max_depth <= 0:
-                raise ValueError("Maximum depth must be a positive integer.")
-
-    min_samples_split_input = input("Enter the minimum samples split for Random Forest (default is 2): ")
-
-    if min_samples_split_input:
-        try:
-            min_samples_split = int(min_samples_split_input)
-        except ValueError:
-            raise ValueError("Minimum samples split must be an integer.")
-        else:
-            if min_samples_split < 2:
-                raise ValueError("Minimum samples split must be at least 2.")
-
-# 1. Define file paths
-DATA_PATH = Path("data") / "Heart_Disease_Cleveland.csv"
 
 # asking for the categorical columns from the user
 categorical_columns_input = input("Enter the categorical columns separated by commas (or leave blank if none): ")
@@ -93,8 +77,8 @@ X_train, X_test, y_train, y_test = split_data(X, y)
 # 3. Instantiate and fit model pipeline
 print("Training model pipeline...")
 
-pipeline = choose_model(args.model_name ,
-                        apply_pca if args.model_name == "svm" else False,
+pipeline = choose_model(model_name ,
+                        apply_pca if model_name == "svm" else False,
                         n_estimators,
                         max_depth,
                         min_samples_split)
@@ -124,11 +108,11 @@ pipeline.fit(X_train, y_train)
 print("Predicting probabilities...")
 
 y_pred_proba = pipeline.predict_proba(X_test)[:,1]
-y_pred_threshold = (y_pred_proba >= args.threshold).astype(int)
+y_pred_threshold = (y_pred_proba >= pred_threshold).astype(int)
 
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {args.model_name} | PCA: {apply_pca if args.model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred_threshold)}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred_threshold):.4f}")
+print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred_threshold)}")
