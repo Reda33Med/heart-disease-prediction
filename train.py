@@ -1,3 +1,5 @@
+# last modified : 30 | sep | 2026
+
 import argparse
 
 #getting the path of the current file
@@ -20,12 +22,19 @@ parser = argparse.ArgumentParser(description= "Train a machine learning model fo
 
 # parsing the command line arguments
 parser.add_argument('--threshold', type=float, default=0.3, help='Threshold for classification (default: 0.3)')
-parser.add_argument('--model_name', type=str, default='svm', help='Picking a model (default: svm)')
+parser.add_argument('--model_name', choices=('svm', 'random_forest'), default='random_forest', help='Pick the model for training (default: random_forest)')
 parser.add_argument('--data_path', type=str, default='data/Heart_Disease_Cleveland.csv', help='Path to dataset (default: data/Heart_Disease_Cleveland.csv)')
+
 # Additional parameters for Random Forest Classifier
 parser.add_argument('--rfc_n_estimators', type=int, default=100, help='The number of estimators for the model random forest classifier (default: 100)')
 parser.add_argument('--rfc_max_depth', type=int, default=None, help='The Maximum depth for the model random forest classifier, range is (0, +inf) (default: None)')
 parser.add_argument('--rfc_min_samples_split', type=int, default=2, help='The Minimum samples split for Random Forest classifier (default is 2)')
+
+#PCA decision:
+parser.add_argument('--apply_PCA', action='store_true', help='Whether to apply PCA for dimensionality reduction (default: False)')
+
+#Categorical columns:
+parser.add_argument('--categorical_columns', type=str, default=None, help='Comma-separated list of categorical columns (default: None)')
 
 
 args = parser.parse_args()
@@ -38,20 +47,23 @@ n_estimators = args.rfc_n_estimators
 max_depth = args.rfc_max_depth
 min_samples_split = args.rfc_min_samples_split
 
+# Extracting the command line arguments into a BOOLEAN variables
+apply_pca = args.apply_PCA
+
+# Extracting the command line arguments into a variable :
+categorical_columns_t = args.categorical_columns
+categorical_columns = [col.strip() for col in categorical_columns_t.split(",") if col.strip()] if categorical_columns_t else None
+
+if pred_threshold < 0 or pred_threshold > 1 :
+    raise ValueError("invalide input for the threshold, must be between 0 and 1 (0 <= x <= 1)")
+
 # 0.picking the model to train
 print("Starting training script...")
-
-if model_name not in ["svm", "random_forest"]:
-    raise ValueError("Invalid model name. Choose 'svm' or 'random_forest'.")
 
 if model_name == "svm":
     print("You have chosen SVM model.")
 elif model_name == "random_forest":
     print("You have chosen Random Forest model.")
-
-if model_name == "svm":
-    print("Do you want to apply PCA for dimensionality reduction? (yes/no)")
-    apply_pca = input().lower() == "yes"
 
 if model_name == "random_forest":
 
@@ -63,10 +75,9 @@ if model_name == "random_forest":
     if min_samples_split < 2:
         raise ValueError("Minimum samples split must be greater than or equal to 2.")
 
+    if n_estimators <= 0 :
+        raise ValueError("The number of estimators must be stricly prositive")
 
-# asking for the categorical columns from the user
-categorical_columns_input = input("Enter the categorical columns separated by commas (or leave blank if none): ")
-categorical_columns = [col.strip() for col in categorical_columns_input.split(",") if col.strip()] if categorical_columns_input else None
 
 print(f"The Categorical columns you have chosen are: {categorical_columns}")
 
