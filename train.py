@@ -1,4 +1,4 @@
-# last modified : 30 | sep | 2026
+# last modified : 01 | octo | 2026
 
 import argparse
 
@@ -55,7 +55,7 @@ categorical_columns_t = args.categorical_columns
 categorical_columns = [col.strip() for col in categorical_columns_t.split(",") if col.strip()] if categorical_columns_t else None
 
 if pred_threshold < 0 or pred_threshold > 1 :
-    raise ValueError("invalide input for the threshold, must be between 0 and 1 (0 <= x <= 1)")
+    raise ValueError("invalid input for the threshold, must be between 0 and 1 (0 <= x <= 1)")
 
 # 0.picking the model to train
 print("Starting training script...")
@@ -95,7 +95,6 @@ pipeline = choose_model(model_name ,
                         min_samples_split)
 
 # 4. Evaluate with stratified cross-validation on the training set
-
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 cv_scores = cross_validate(
@@ -121,9 +120,12 @@ print("Predicting probabilities...")
 y_pred_proba = pipeline.predict_proba(X_test)[:,1]
 y_pred_threshold = (y_pred_proba >= pred_threshold).astype(int)
 
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test ROC-AUC Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test f1 Score: {f1_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Precision Score: {precision_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Recall Score: {recall_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Accuracy Score: {accuracy_score(y_test, y_pred_threshold):.4f}")
-print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test Confusion Matrix: {confusion_matrix(y_test, y_pred_threshold)}")
+# 7. Print the test scores
+scoring_names_var = ['ROC-AUC' , 'f1' , 'Precision' , 'Recall' , 'Accuracy' ,  'Confusion Matrix']
+
+for scoring_name in scoring_names_var:
+    if scoring_name == 'ROC-AUC' :
+        print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test {scoring_name} Score: {roc_auc_score(y_test, y_pred_proba):.4f}")
+
+    else:
+        print(f"Model: {model_name} | PCA: {apply_pca if model_name == 'svm' else False} | Test {scoring_name} Score: {roc_auc_score(y_test, y_pred_threshold):.4f}")
